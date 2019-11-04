@@ -1,0 +1,584 @@
+function varargout = Traplan(varargin)
+% TRAPLAN MATLAB code for Traplan.fig
+%      TRAPLAN, by itself, creates a new TRAPLAN or raises the existing
+%      singleton*.
+%
+%      H = TRAPLAN returns the handle to a new TRAPLAN or the handle to
+%      the existing singleton*.
+%
+%      TRAPLAN('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in TRAPLAN.M with the given input arguments.
+%
+%      TRAPLAN('Property','Value',...) creates a new TRAPLAN or raises the
+%      existing singleton*.  Starting from the left, property value pairs are
+%      applied to the GUI before Traplan_OpeningFcn gets called.  An
+%      unrecognized property name or invalid value makes property application
+%      stop.  All inputs are passed to Traplan_OpeningFcn via varargin.
+%
+%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
+%      instance to run (singleton)".
+%
+% See also: GUIDE, GUIDATA, GUIHANDLES
+
+% Edit the above text to modify the response to help Traplan
+
+% Last Modified by GUIDE v2.5 11-Jul-2012 14:05:03
+
+% Begin initialization code - DO NOT EDIT
+gui_Singleton = 1;
+gui_State = struct('gui_Name',       mfilename, ...
+                   'gui_Singleton',  gui_Singleton, ...
+                   'gui_OpeningFcn', @Traplan_OpeningFcn, ...
+                   'gui_OutputFcn',  @Traplan_OutputFcn, ...
+                   'gui_LayoutFcn',  [] , ...
+                   'gui_Callback',   []);
+if nargin && ischar(varargin{1})
+    gui_State.gui_Callback = str2func(varargin{1});
+end
+
+if nargout
+    [varargout{1:nargout}] = gui_mainfcn(gui_State, varargin{:});
+else
+    gui_mainfcn(gui_State, varargin{:});
+end
+% End initialization code - DO NOT EDIT
+
+
+% --- Executes just before Traplan is made visible.
+function Traplan_OpeningFcn(hObject, eventdata, handles, varargin)
+% This function has no output args, see OutputFcn.
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+% varargin   command line arguments to Traplan (see VARARGIN)
+
+% Choose default command line output for Traplan
+handles.output = hObject;
+
+% Update handles structure
+guidata(hObject, handles);
+
+% UIWAIT makes Traplan wait for user response (see UIRESUME)
+% uiwait(handles.figure1);
+
+
+% --- Outputs from this function are returned to the command line.
+function varargout = Traplan_OutputFcn(hObject, eventdata, handles) 
+% varargout  cell array for returning output args (see VARARGOUT);
+% hObject    handle to figure
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Get default command line output from handles structure
+varargout{1} = handles.output;
+
+
+% --- Executes on button press in pushbutton1.
+function pushbutton1_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+prompt={'输入时间向量t：','输入起始点坐标:','输入终止点坐标：'};
+name='参数：';
+numlines=1;
+%屈膝
+% defaultanswer={'0:0.056:40','[pi/2  pi/2 0 0  pi  -pi/2  pi 0 pi/2 pi 0 0 -pi/2 0]','[pi/2  pi/2 (-pi/8) (pi/6)  (23*pi/24)  -pi/2  pi 0 pi/2 (pi*25/24) (-pi/6) (pi/8) -pi/2 0]'};
+%%%两条腿侧面看一致：3关节与12关节角度相反，4关节与11关节相反，5关节与10关节和为2pi;5关节角度=pi-(3关节+4关节角度)；10关节角度=pi-(11关节+12关节角度)
+
+%屈膝之后抬腿，此时脚面水平
+ % defaultanswer={'0:0.056:40','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*25/24) (-pi/6) (pi/8) -pi/2 0]','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*6/5) (-pi/5) (0) -pi/2 0]'};
+
+%屈膝之后抬腿，此时脚面微微向上抬起。
+% defaultanswer={'0:0.056:40','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*25/24) (-pi/6) (pi/8) -pi/2  0]','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*5/4) (-pi/7) (0) -pi/2 0]'};
+
+%一条腿屈膝，另一只腿从空中某点到另一点。
+% defaultanswer={'0:0.01:40','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*5/4) (-pi/7) (0) -pi/2 0]','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*4/3) (-pi/12) (-pi*1/4) -pi/2 0]'};
+%%%%改变3、4、5即可改变一只腿的轨迹，改变10、11、12可改变另一只腿的轨迹
+%%%%10初始值为pi,往外伸就增加0.25pi什么的。11关节初始值为0，往里收，减少0.1pi。12关节为10往外伸的减去11关节往里收的角度，再取负值，即往里改，以保证脚面平行地面。
+
+%一条腿屈膝，另一只腿从空中某点再点地。
+%defaultanswer={'0:0.056:40','[pi/2  pi/2 -pi/8 pi/6  23*pi/24  -pi/2  pi 0 pi/2 (pi*5/4) (-pi/7) (0) -pi/2 0]','[pi/2  pi/2 -pi/3 pi/2  5*pi/6  -pi/2  pi 0 pi/2 (pi*4/3) (-pi/6) (-pi*1/6) -pi/2 0]'};
+
+%起始屈膝动作，后迈出一只脚，并着地。
+% defaultanswer={'0:0.02:40','[pi/2  pi/2 (-pi/8) (pi/6)  (23*pi/24)  -pi/2  pi 0 pi/2 (pi*25/24) (-pi/6) (pi/8) -pi/2 0]','[pi/2  pi/2 -pi/3 pi/2  5*pi/6  -pi/2  pi 0 pi/2 (pi*4/3) (-pi/6) (-pi*1/6) -pi/2 0]'};
+%调整重心
+% defaultanswer={'0:0.02:40','[pi/2  pi/2 -pi/3 pi/2  5*pi/6  -pi/2  pi 0 pi/2 (pi*4/3) (-pi/6) (-pi*1/6) -pi/2 0]','[pi/2  pi/2 -pi/3 pi/2  5*pi/6  -pi/2  pi 0 pi/2 (pi*7/6) (-pi/2) (pi*1/3) -pi/2 0]'};
+% defaultanswer={'0:0.02:40','[pi/2  pi/2 -pi/3 pi/2  5*pi/6  -pi/2  pi 0 pi/2 (pi*4/3) (-pi/6) (-pi*1/6) -pi/2 0]','[pi/2  pi/2  pi/6 pi/6  2*pi/3  -pi/2  pi 0 pi/2 (pi*7/6) (-pi/2) (pi*1/3) -pi/2 0]'};
+
+
+%%%%一条腿为支点，另一条腿从后方迈向前方。
+ %defaultanswer={'0:0.02:40','[pi/2  pi/2 pi/6  pi/6  2*pi/3  -pi/2  pi 0 pi/2 (pi*7/6) (-pi/2) (pi*1/3) -pi/2 0]','[pi/2  pi/2 -pi/3 pi/2  5*pi/6  -pi/2  pi 0 pi/2 (pi*4/3) (-pi/6) (-pi*1/6) -pi/2 0]'};
+
+ defaultanswer={'0:0.02:40','[pi/2  pi/2 -pi/12 pi/3  3*pi/4  -pi/2  pi 0 pi/2 (pi*5/4) (-pi/3) (pi*1/12) -pi/2 0]','[pi/2  pi/2 -pi/12 pi/3  3*pi/4  -pi/2  pi 0 pi/2 (pi*5/4) (-pi/3) (pi*1/12) -pi/2 0]'};
+
+answer=inputdlg(prompt,name,numlines,defaultanswer);
+if ~isempty(answer),
+    t=str2num(answer{1});
+    qz=str2num(answer{2});
+    qr=str2num(answer{3});
+end
+eval('puma560');
+% qz=[qz 0];
+% qr=[qr 0];
+[qt,qdt,qddt]=jtraj(qz,qr,t);%6个关节的角度 角速度 角加速度规划
+
+T=fkine(p560,qt);
+
+figure('Name','关节2,4角度、速度和加速度轨迹规划');
+title('关节2,4角度、速度和加速度轨迹规划');
+
+
+subplot(3,2,1);
+plot(t,qt(:,2),'k')
+xlabel('Time (s)');
+ylabel('Joint 2 (rad)');
+title('(a)');
+subplot(3,2,2);
+plot(t,qt(:,4),'k')
+xlabel('Time (s)');
+ylabel('Joint 4 (rad)');
+title('(d)');
+subplot(3,2,3)
+plot(t,qdt(:,2),'k')
+xlabel('Time (s)');
+ylabel('Joint 2 (rad/s)');
+title('(b)');
+subplot(3,2,4)
+plot(t,qdt(:,4),'k')
+xlabel('Time (s)');
+ylabel('Joint 4 (rad/s)');
+title('(e)');
+subplot(3,2,5)
+plot(t,qddt(:,2),'k')
+xlabel('Time (s)');
+ylabel('Joint 2 (rad/s2)');
+title('(c)');
+subplot(3,2,6)
+plot(t,qddt(:,4),'k')
+xlabel('Time (s)');
+ylabel('Joint 4 (rad/s2)');
+title('(f)');
+% figure('Name','fengren机器人仿真演示窗口---关节空间轨迹规划(位置)');
+% subplot(3,1,1);
+% plot(t, squeeze(T(1,4,:)));
+% xlabel('Time (s)');
+% ylabel('X (m)');
+% subplot(3,1,2);
+% plot(t, squeeze(T(2,4,:)));
+% xlabel('Time (s)');
+% ylabel('Y (m)');
+% subplot(3,1,3);
+% plot(t, squeeze(T(3,4,:)));
+% xlabel('Time (s)');
+% ylabel('Z (m)');
+% figure('Name','fengren机器人仿真演示窗口---关节空间轨迹规划(角度)');
+% subplot(3,2,1)
+% plot(t,qt(:,1))
+% xlabel('Time (s)');
+% ylabel('Joint 1 (rad)')
+% subplot(3,2,2)
+% plot(t,qt(:,2))
+% xlabel('Time (s)');
+% ylabel('Joint 2 (rad)')
+% subplot(3,2,3)
+% plot(t,qt(:,3))
+% xlabel('Time (s)');
+% ylabel('Joint 3 (rad)')
+% subplot(3,2,4)
+% plot(t,qt(:,4))
+% xlabel('Time (s)');
+% ylabel('Joint 4 (rad)')
+% subplot(3,2,5)
+% plot(t,qt(:,5))
+% xlabel('Time (s)');
+% ylabel('Joint 5 (rad)')
+% subplot(3,2,6)
+% plot(t,qt(:,6))
+% xlabel('Time (s)');
+% ylabel('Joint 6 (rad)');
+% 
+% figure('Name','fengren机器人仿真演示窗口---关节空间轨迹规划(角速度)');
+% subplot(3,2,1)
+% plot(t,qdt(:,1))
+% xlabel('Time (s)');
+% ylabel('Joint 1 (rad/s)')
+% subplot(3,2,2)
+% plot(t,qdt(:,2))
+% xlabel('Time (s)');
+% ylabel('Joint 2 (rad/s)')
+% subplot(3,2,3)
+% plot(t,qdt(:,3))
+% xlabel('Time (s)');
+% ylabel('Joint 3 (rad/s)')
+% subplot(3,2,4)
+% plot(t,qdt(:,4))
+% xlabel('Time (s)');
+% ylabel('Joint 4 (rad/s)')
+% subplot(3,2,5)
+% plot(t,qdt(:,5))
+% xlabel('Time (s)');
+% ylabel('Joint 5 (rad/s)')
+% subplot(3,2,6)
+% plot(t,qdt(:,6))
+% xlabel('Time (s)');
+% ylabel('Joint 6 (rad/s)');
+% 
+% 
+% figure('Name','fengren机器人仿真演示窗口---关节空间轨迹规划(角加速度)');
+% subplot(3,2,1)
+% plot(t,qddt(:,1))
+% xlabel('Time (s)');
+% ylabel('Joint 1 (rad/s2)')
+% subplot(3,2,2)
+% plot(t,qddt(:,2))
+% xlabel('Time (s)');
+% ylabel('Joint 2 (rad/s2)')
+% subplot(3,2,3)
+% plot(t,qddt(:,3))
+% xlabel('Time (s)');
+% ylabel('Joint 3 (rad/s2)')
+% subplot(3,2,4)
+% plot(t,qddt(:,4))
+% xlabel('Time (s)');
+% ylabel('Joint 4 (rad/s2)')
+% subplot(3,2,5)
+% plot(t,qddt(:,5))
+% xlabel('Time (s)');
+% ylabel('Joint 5 (rad/s2)')
+% subplot(3,2,6)
+% plot(t,qddt(:,6))
+% xlabel('Time (s)');
+% ylabel('Joint 6 (rad/s2)');
+
+% puma560_gui();
+% puma_gui=guihandles(puma560_gui());
+% axes(puma_gui.axes1);
+figure
+plot(p560,qt);
+
+% x=squeeze(T(1,4,:));
+% y=squeeze(T(2,4,:));
+% z=squeeze(T(3,4,:));
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+puma560_gui();
+eval('puma560');
+prompt={'输入时间向量：','输入起始点坐标:','输入起点位姿(rpy)：','输入终止点坐标：','输入终点位姿(rpy)'};
+name='参数：';
+numlines=1;
+defaultanswer={'0:0.056:10','transl(0,-1.14,0)','[0 0 pi/2]','transl(-0.14,0.5,-0.5)','[0 -pi/2 0]'};
+answer=inputdlg(prompt,name,numlines,defaultanswer);
+if ~isempty(answer),
+    t=str2num(answer{1});
+    T1=str2num(answer{2});
+    wz1=str2num(answer{3});
+    T2=str2num(answer{4});
+    wz2=str2num(answer{5});
+end
+rx1=rotx(wz1(1));
+ry1=roty(wz1(2));
+rz1=rotz(wz1(3));
+rx2=rotx(wz2(1));
+ry2=roty(wz2(2));
+rz2=rotz(wz2(3));
+T1=T1*rz1*ry1*rx1;
+T2=T2*rz2*ry2*rx2;
+T=ctraj(T1,T2,length(t));%得到末端位姿轨迹规划
+T
+q=ikine(p560,T); %每一个T得到一个q(角度)
+figure('Name','fengren机器人仿真演示窗口---笛卡尔规划(角度)');
+subplot(3,2,1)
+plot(t,q(:,1))
+xlabel('Time (s)');
+ylabel('Joint 1 (rad)')
+subplot(3,2,2)
+plot(t,q(:,2))
+xlabel('Time (s)');
+ylabel('Joint 2 (rad)')
+subplot(3,2,3)
+plot(t,q(:,3))
+xlabel('Time (s)');
+ylabel('Joint 3 (rad)')
+subplot(3,2,4)
+plot(t,q(:,4))
+xlabel('Time (s)');
+ylabel('Joint 4 (rad)')
+subplot(3,2,5)
+plot(t,q(:,5))
+xlabel('Time (s)');
+ylabel('Joint 5 (rad)')
+subplot(3,2,6)
+plot(t,q(:,6))
+xlabel('Time (s)');
+ylabel('Joint 6 (rad)')
+%eval('puma560');
+puma_gui=guihandles(puma560_gui());
+axes(puma_gui.axes1);
+plot(p560,q);
+
+
+% --- Executes during object creation, after setting all properties.
+function axes1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to axes1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: place code in OpeningFcn to populate axes1
+
+
+% --- Executes on mouse press over axes background.
+function axes1_ButtonDownFcn(hObject, eventdata, handles)
+% hObject    handle to axes1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global I;
+file = uigetfile(...
+{'*.bmp;*.png;*.jpg;*.gif;*.tif;','ALLpicturefiles(*.bmp,*.jpg,*.gif,*.tif)';...
+     '*.*'  ,'allfiles(*.*)' },...
+     'Pick a file');
+if ~isequal(file, 0)
+   % figure;
+    I=imread(file);
+    imshow(I); end; title('查看所需图像');
+
+
+% --- Executes on button press in pushbutton4.
+function pushbutton4_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton4 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+eval('puma560');
+
+global I2;
+[i,j]=size(I2);
+k=ceil(-i/2):1:(ceil(i/2)-1);
+k=k/1000;
+m=ceil(-j/2):1:(ceil(j/2)-1);
+m=m/1000;
+figure
+title('waiting');
+q=[];
+hold on
+for counteri=1:2:i
+    
+           T1=transl(0.5,k(counteri),m(j));
+           T2=transl(0.5,k(counteri),m(1));
+           T=ctraj(T1,T2,8);
+           qxq=ikine(p560,T);
+           q=[q;qxq];
+
+                   for counterj=1:j
+                             if I2(counteri,counterj)==1,
+                                 plot3(0.7,k(counteri),m(counterj));     
+                             end;
+                      end;    
+
+           T1=transl(0.5,k(counteri+1),m(1));
+           T2=transl(0.5,k(counteri+1),m(j));
+           T=ctraj(T1,T2,8);
+           qxq=ikine(p560,T);
+           q=[q;qxq];    
+       
+             for counterj=1:j
+                        if I2(counteri,counterj)==1,
+                            plot3(0.7,k(counteri+1),m(counterj));     
+                        end;
+             end;    
+end;
+hold off
+
+plot(p560,q);
+
+title('运行结束');
+
+
+
+
+
+
+
+% --- Executes on button press in pushbutton5.
+function pushbutton5_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton5 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global I;
+global I2;
+I1=rgb2gray(I);
+level=graythresh(I1);
+I2=im2bw(I1,0.8);
+imshow(I2);
+
+
+% --- Executes on button press in pushbutton6.
+function pushbutton6_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton6 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+eval('puma560');
+
+global I2;
+[i,j]=size(I2);
+k=ceil(-i/2):1:(ceil(i/2)-1);
+k=k/1000;
+m=ceil(-j/2):1:(ceil(j/2)-1);
+m=m/1000;
+figure('Name','fengren机器人仿真演示窗口--画图程序');
+hold on;
+title('waiting');
+n=1;%圈数n
+for n=1:i/2
+           T1=transl(0.5,k(n),m(j+1-n));
+           T2=transl(0.5,k(n),m(n));
+           T=ctraj(T1,T2,4);
+           q=ikine(p560,T);
+           plot(p560,q);
+          for counterj=n:j+1-n
+                 if I2(n,counterj)==1
+                     plot3(0.7,k(n),m(counterj)); 
+                 end;
+          end;      
+          
+           T1=transl(0.5,k(n+1),m(n));
+           T2=transl(0.5,k(i-n),m(n));
+           T=ctraj(T1,T2,4);
+           q=ikine(p560,T);
+           plot(p560,q);
+          for counteri=n+1:i-n
+                 if I2(counteri,n)==1
+                     plot3(0.7,k(counteri),m(n)); 
+                 end;
+          end; 
+          
+          
+           T1=transl(0.5,k(i+1-n),m(n));
+           T2=transl(0.5,k(i+1-n),m(j+1-n));
+           T=ctraj(T1,T2,4);
+           q=ikine(p560,T);
+           plot(p560,q);
+          for counterj=n:j+1-n
+                 if I2(i+1-n,counterj)==1
+                     plot3(0.7,k(i+1-n),m(counterj)); 
+                 end;
+          end;  
+          
+          
+           T1=transl(0.5,k(i-n),m(j+1-n));
+           T2=transl(0.5,k(n+1),m(j+1-n));
+           T=ctraj(T1,T2,4);
+           q=ikine(p560,T);
+           plot(p560,q);
+          for counteri=n+1:i-n
+                 if I2(counteri,j+1-n)==1
+                     plot3(0.7,k(counteri),m(j+1-n)); 
+                 end;
+          end;  
+end;
+hold off;
+
+
+% --- Executes on button press in pushbutton7.
+function pushbutton7_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton7 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+prompt={'输入时间段：','输入力矩向量：'};
+name='参数';
+numlines=1;
+defaultanswer={'[0 2]','[1 1 1 1 1 1]'};
+answer=inputdlg(prompt,name,numlines,defaultanswer);
+if ~isempty(answer),
+    t0=str2num(answer{1});
+    torque=str2num(answer{2});
+end
+eval('puma560');
+[t,q,qd]=fdyn(nofriction(p560),t0(1),t0(2))
+[n,m]=size(t)
+qdd=[];
+for i=1:n
+    qddx=accel(nofriction(p560),q(i,:),qd(i,:),torque);
+    qddx=qddx';
+    qdd=[qdd;qddx];
+end
+qdd
+nq=find(all(q==0)==0);
+figure('Name','fengren机器人仿真演示窗口---动力学正问题(位置)','NumberTitle','off');
+for i=1:length(nq),
+    subplot(round(length(nq)/2),2,i);
+    plot(t,q(:,i));
+    xlabel('Time(s)');
+    ylabel(['Joint ' num2str(nq(i)) ' (rad)']);
+end
+nq=find(all(qd==0)==0);
+figure('Name','fengren机器人仿真演示窗口---动力学正问题(速度)','NumberTitle','off');
+for i=1:length(nq),
+    subplot(round(length(nq)/2),2,i);
+    plot(t,qd(:,i));
+    xlabel('Time(s)');
+    ylabel(['Joint ' num2str(nq(i)) ' (rad/s)']);
+end
+nq=find(all(qdd==0)==0);
+figure('Name','fengren机器人仿真演示窗口---动力学正问题(加速度)','NumberTitle','off');
+for i=1:length(nq),
+    subplot(round(length(nq)/2),2,i);
+    plot(t,qdd(:,i));
+    xlabel('Time(s)');
+    ylabel(['Joint ' num2str(nq(i)) ' (rad/s2)']);
+end
+puma_gui=guihandles(puma560_gui());
+axes(puma_gui.axes1);
+plot(p560,q);
+
+
+% --- Executes on button press in pushbutton8.
+function pushbutton8_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton8 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+prompt={'输入时间向量：','输入起始点：','输入终止点：'};
+name='参数';
+numlines=1;
+defaultanswer={'0:0.056:2','[0 0 0 0 0 0]','[0 pi/2 -pi/2 0 0 0]'};
+answer=inputdlg(prompt,name,numlines,defaultanswer);
+if ~isempty(answer),
+    t=str2num(answer{1});
+    qz=str2num(answer{2});
+    qr=str2num(answer{3});
+end
+eval('puma560');
+[q,qd,qdd]=jtraj(qz,qr,t);
+tau=rne(p560,q,qd,qdd)
+[n,m]=size(tau);
+figure('Name','fengren机器人仿真演示窗口---动力学逆问题(无重力)','NumberTitle','off');
+for i=1:m,
+    subplot(m/2,2,i);
+    plot(t,tau(:,i));
+    xlabel('Time(s)');
+    ylabel(['Joint ' num2str(i) ' torque(Nm)']);
+end
+
+puma_gui=guihandles(puma560_gui());
+axes(puma_gui.axes1);
+plot(p560,q);
+
+
+% --- Executes during object creation, after setting all properties.
+function figure1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
